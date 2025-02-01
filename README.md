@@ -1,3 +1,4 @@
+
 # FakeMetrics
 
 FakeMetrics is a Go package designed for generating fake metrics that can be integrated with Prometheus or Victoria Metrics. This package is ideal for testing and demo purposes, providing a simple way to simulate metric data without needing a live system.
@@ -8,6 +9,7 @@ FakeMetrics is a Go package designed for generating fake metrics that can be int
 - **Fake Gauges**: Generates gauges that return random float values.
 - **Fake Histograms**: Updates histograms with random values.
 - **Customizable**: Configure the number of each metric type, update intervals, prefixes, and static labels.
+- **Update Metrics Toggle**: Choose whether to periodically update generated metrics via the `UpdateMetrics` configuration flag.
 
 ## Installation
 
@@ -77,12 +79,15 @@ cfg := fakemetrics.Config{
  "environment": "production",
 
  },
+// Set UpdateMetrics to true to periodically update generated metrics.
+// Set to false if you want to only register metrics  and not update them.
+UpdateMetrics: true,
 
  }
 
   
 
-// // Create and start generator
+// Create and start generator
 
  gen := fakemetrics.New(cfg)
 
@@ -102,7 +107,7 @@ cfg := fakemetrics.Config{
 
   
 
- // Start server (user responsibility)
+ // Start server
 
  http.ListenAndServe(":8080", nil)
 
@@ -117,12 +122,14 @@ go
 
 ```go
 type Config struct {
-    MetricPrefix   string            // Prefix added to each metric name (default: "app_")
+    MetricPrefix   string            // Prefix added to each metric name (default: "fake_")
     NumCounters    int               // Number of counters to create (default: 10)
     NumGauges      int               // Number of gauges to create (default: 10)
     NumHistograms  int               // Number of histograms to create (default: 10)
     UpdateInterval time.Duration     // Interval for updating metric values (default: 2s)
     Labels         map[string]string // A set of labels to be appended to each metric (default: {"environment": "lazy"})
+	UpdateMetrics  bool              // If true, periodically update generated metrics (default: false)
+
 }
 ```
 
@@ -130,11 +137,10 @@ type Config struct {
 
 1. **Metric Creation**: Upon starting, the generator creates the specified number of counters, gauges, and histograms. Each metric name is prefixed with `MetricPrefix`, and additional labels are appended in Prometheus style (e.g., `key="value"`).
     
-2. **Metric Updates**: A goroutine runs on a ticker based on the `UpdateInterval`. Each tick performs the following:
-    
-    - Counters are incremented by a random value.
-    - Gauges provide a new random float value (via a dynamic function).
-    - Histograms are updated with new random float values.
+2. **Metric Updates**: If enabled by the `UpdateMetrics` flag, a goroutine runs on a ticker based on the `UpdateInterval`. Each tick performs the following:
+- Counters are incremented by a random value.
+- Gauges provide a new random float value (via a dynamic function).
+- Histograms are updated with new random float values.
 3. **Graceful Stop**: The generator can be stopped gracefully, ensuring that the background goroutine exits cleanly.
     
 
@@ -143,4 +149,6 @@ type Config struct {
 This project uses the following libraries:
 
 - [VictoriaMetrics/metrics](https://github.com/VictoriaMetrics/metrics): For metric registration and manipulation.
-- [brianvoe/gofakeit](https://github.com/brianvoe/gofakeit): For generating random values for the metrics.
+
+Feel free to contribute or open issues if you have any questions. Enjoy testing!
+

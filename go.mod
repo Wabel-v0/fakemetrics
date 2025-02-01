@@ -4,8 +4,8 @@ go 1.23.4
 
 require (
 	github.com/VictoriaMetrics/metrics v1.35.1
-	github.com/brianvoe/gofakeit/v6 v6.28.0
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20250128182459-e0ece0dbea4c
 )
 
 require (

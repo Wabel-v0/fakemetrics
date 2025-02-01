@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 			name:   "default configuration",
 			config: Config{},
 			expected: Config{
-				MetricPrefix:   "app_",
+				MetricPrefix:   "fake_",
 				NumCounters:    10,
 				NumGauges:      10,
 				NumHistograms:  10,

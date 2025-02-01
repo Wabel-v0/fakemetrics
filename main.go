@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/VictoriaMetrics/metrics"
-	"github.com/brianvoe/gofakeit/v6"
+	"golang.org/x/exp/rand"
 )
 
 // Config defines the fake metrics generation parameters
@@ -18,6 +18,7 @@ type Config struct {
 	NumHistograms  int
 	UpdateInterval time.Duration
 	Labels         map[string]string
+	UpdateMetrics  bool
 }
 
 // Generator creates and manages fake metrics
@@ -31,7 +32,7 @@ type Generator struct {
 func New(cfg Config) *Generator {
 	// Set default values
 	if cfg.MetricPrefix == "" {
-		cfg.MetricPrefix = "app_"
+		cfg.MetricPrefix = "fake_"
 	}
 	if cfg.NumCounters == 0 {
 		cfg.NumCounters = 10
@@ -60,22 +61,26 @@ func New(cfg Config) *Generator {
 // Start begins updating metric values
 func (g *Generator) Start() {
 	g.createMetrics()
-	g.waitGroup.Add(1)
 
-	go func() {
-		defer g.waitGroup.Done()
-		ticker := time.NewTicker(g.config.UpdateInterval)
-		defer ticker.Stop()
+	if g.config.UpdateMetrics {
+		g.waitGroup.Add(1)
+		go func() {
+			defer g.waitGroup.Done()
+			ticker := time.NewTicker(g.config.UpdateInterval)
+			defer ticker.Stop()
 
-		for {
-			select {
-			case <-ticker.C:
-				g.updateMetrics()
-			case <-g.stopChan:
-				return
+			for {
+				select {
+				case <-ticker.C:
+					g.updateMetrics()
+				case <-g.stopChan:
+					return
+				}
 			}
-		}
-	}()
+		}()
+	} else {
+		fmt.Println("Metric updates are disabled by configuration.")
+	}
 }
 
 // Stop halts metric updates
@@ -95,7 +100,7 @@ func (g *Generator) createMetrics() {
 	for i := 0; i < g.config.NumGauges; i++ {
 		name := g.buildName(fmt.Sprintf("gauge_%d", i))
 		metrics.NewGauge(name, func() float64 {
-			return gofakeit.Float64Range(0, 100)
+			return rand.Float64() * 100
 		})
 	}
 
@@ -110,14 +115,14 @@ func (g *Generator) updateMetrics() {
 	// Update counter values using valid range
 	for i := 0; i < g.config.NumCounters; i++ {
 		name := g.buildName(fmt.Sprintf("counter_%d", i))
-		intValue := int(gofakeit.Number(1, 10))
+		intValue := rand.Intn(10) + 1
 		metrics.GetOrCreateCounter(name).Add(intValue)
 	}
 
 	// Update histogram values
 	for i := 0; i < g.config.NumHistograms; i++ {
 		name := g.buildName(fmt.Sprintf("histogram_%d", i))
-		metrics.GetOrCreateHistogram(name).Update(gofakeit.Float64Range(0, 100))
+		metrics.GetOrCreateHistogram(name).Update(rand.Float64() * 100)
 	}
 }
 
