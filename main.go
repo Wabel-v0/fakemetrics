@@ -117,6 +117,7 @@ func (g *Generator) updateMetrics() {
 		name := g.buildName(fmt.Sprintf("counter_%d", i))
 		intValue := rand.Intn(10) + 1
 		metrics.GetOrCreateCounter(name).Add(intValue)
+
 	}
 
 	// Update histogram values

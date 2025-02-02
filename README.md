@@ -79,8 +79,8 @@ cfg := fakemetrics.Config{
  "environment": "production",
 
  },
-// Set UpdateMetrics to true to periodically update generated metrics.
-// Set to false if you want to only register metrics  and not update them.
+// Set UpdateMetrics to true to update generated metrics.
+// Set to false if you want to only register metrics and not update them.
 UpdateMetrics: true,
 
  }
@@ -128,7 +128,7 @@ type Config struct {
     NumHistograms  int               // Number of histograms to create (default: 10)
     UpdateInterval time.Duration     // Interval for updating metric values (default: 2s)
     Labels         map[string]string // A set of labels to be appended to each metric (default: {"environment": "lazy"})
-	UpdateMetrics  bool              // If true, periodically update generated metrics (default: false)
+	UpdateMetrics  bool              // If true, it update generated metrics (default: false)
 
 }
 ```
@@ -141,7 +141,7 @@ type Config struct {
 - Counters are incremented by a random value.
 - Gauges provide a new random float value (via a dynamic function).
 - Histograms are updated with new random float values.
-3. **Graceful Stop**: The generator can be stopped gracefully, ensuring that the background goroutine exits cleanly.
+
     
 
 ## Dependencies
